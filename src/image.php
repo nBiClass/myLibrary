@@ -49,6 +49,20 @@ class image {
 
 
     public function __construct($file = '') {
+        $this->openFile($file);
+    }
+
+    public function __destruct() {
+        //销毁资源
+        if ($this->img) {
+            ImageDestroy($this->img);
+        }
+    }
+
+    /*
+     * 读取文件
+     */
+    public function openFile($file = ''){
         //图片是否存在
         $isFile = file_exists($file) && mb_strlen($file) > 4;
         if (!$isFile) {
@@ -90,13 +104,6 @@ class image {
         } catch (\Exception $e) {
             $this->mess = $e->getMessage();
             return false;
-        }
-    }
-
-    public function __destruct() {
-        //销毁资源
-        if ($this->img) {
-            ImageDestroy($this->img);
         }
     }
 
