@@ -49,7 +49,10 @@ class image {
 
 
     public function __construct($file = '') {
-        $this->openFile($file);
+        if($file){
+            $this->openFile($file);
+        }
+
     }
 
     public function __destruct() {
@@ -464,4 +467,66 @@ class image {
             return false;
         }
     }
+
+    /**
+     * 制造水印图片
+     * @param string $text 水印文字
+     * @param false $save 保存路径，值为 false 浏览器直接输出
+     * @param int $size 文字大小
+     * @param int $angle 倾斜角度 1-90
+     * @param string $color 文字颜色
+     * @param string $font 字体文件
+     * @return array|void
+     */
+    public function makeWeterImg($text = 'Hello Word', $save = false, int $size = 60, int $angle = 45, string $color = '#F8F8F8',$font = __DIR__ . '/font.ttf') {
+        try {
+            //计算字符串在图片中的长度
+            $a = (imagettfbbox($size, 0, $font, $text));
+            $length = $a[2] - $a[0];
+
+            //根据输入文字计算出图片宽高，考虑因素，文字字体大小，倾斜角度。。应该是用三角函数算出最佳的宽高。我就随意了，算的脑瓜子疼
+            $widh = abs(intval((($a[2] + $a[0]) * abs(cos(deg2rad($angle)))) + abs($a[7]) - $a[0]));
+            $height = abs(intval($a[7])) + abs(intval(sin(deg2rad($angle)) * $length));
+
+            //创建画布
+            $image = ImageCreateTrueColor($widh, $height);
+            $bg = imagecolorallocatealpha($image, 0, 0, 0, 127);      //设置背景完全透明
+            imagefill($image, 0, 0, $bg);                                   //颜色填充
+            imagesavealpha($image, true);                                   //保持透明度
+
+            //文字颜色
+            $color = str_split(substr($color, 1), 2);
+            $color = array_map('hexdec', $color);
+            if (empty($color[3]) || $color[3] > 127) {
+                $color[3] = 0;
+            }
+            $col = imagecolorallocatealpha($image, $color[0], $color[1], $color[2], $color[3]);
+
+            //文字坐标
+            $x = abs($a[7] - $a[0]) * sin(deg2rad($angle));
+            $y = $height;
+
+            //写入文字
+            imagettftext($image, $size, $angle, intval($x), intval($y), $col, $font, $text);
+
+            //保存或者直接输出
+            if ($save) {
+                $savePath = str_replace(basename($save), '', $save);
+                if (!file_exists($savePath)) {
+                    mkdir($savePath, 0777, true);
+                }
+                imagepng($image, $save);
+                imagedestroy($image);
+                return array('code' => 200, 'msg' => '图片生成成功', ['path' => $save]);
+            } else {
+                header('Content-Type: image/png');
+                imagepng($image);
+                imagedestroy($image);
+                exit;
+            }
+        } catch (\Exception $e) {
+            return array('code' => 500, 'msg' => '系统错误', ['error' => $e->getMessage()]);
+        }
+    }
+
 }

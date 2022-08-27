@@ -36,10 +36,34 @@
 // +----------------------------------------------------------------------
 
 
-require "./vendor/autoload.php";
+require __DIR__ . "/vendor/autoload.php";
 
-$img=__DIR__.'/1.png';
+$img = __DIR__ . '/test1.png';
 
-$obj = new \longzy\image($img);
-$obj->text('10086',30,20,20,'#f28424');
+$obj = new \longzy\image();
+$obj->openFile($img);
+
+//添加水印文字
+$obj->text('为中华之崛起而读书', 14, 20, 20, '#000000', 45);
+
+//裁剪图片
+$obj->crop(100, 100);
+
+//缩略图片
+$obj->thumb(100, 100);
+
+//添加水印图片
+$obj->water($img, '300', '100', 100);
+
+//本地保存
+$obj->save(__DIR__ . '/Hello.png', 100);
+
+//浏览器输出
 $obj->show();
+
+//更多方法请打开类文件自行查看
+
+
+//生成水印图片
+$obj = new \longzy\image();
+$obj->makeWeterImg('为中华之崛起而读书');
