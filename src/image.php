@@ -102,8 +102,9 @@ class image {
                     $this->mess = '目前仅支持PNG,JPG,JPEG格式图片处理';
                     return false;
             }
-
-
+            //保留图片透明色
+            imagealphablending($this->img, false);
+            imagesavealpha($this->img, true);
         } catch (\Exception $e) {
             $this->mess = $e->getMessage();
             return false;

@@ -1,2 +1,5 @@
 .idea
 /test.png
+/vendor/
+*.log
+composer.lock
