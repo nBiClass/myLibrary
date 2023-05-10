@@ -45,11 +45,24 @@
 
 namespace longzy;
 class xdecode {
-    private $strbase = "FgeWcAXQEKwTd54nRtZOSyJizUP6QEB1u3Mxb8mNlpvf70CsakVjqHDhoG2YLrI";
+    private $strbase = "FgeWcAXQEKwTd54nRtZOSyJizUP6EB1u3Mxb8mNlpvf70CsakVjqHDhoG2YLrI";
+    private $strbaseLower = "df1l2e9qgzxuio4m0w5hjk6vb7rty8cn3pas";
     private $key, $length, $codelen, $codenums, $codeext;
 
-    // 初始化
-    function __construct($length = 16, $key = 3.14590265478) {
+    /**
+     * @param int $length 标记长度字符
+     * @param float $key 数字加密字符串
+     * @param false $lower 是否使用纯小写和数字，或者定义的打乱顺序的不重复字符串【全部26位字母+10位数字 或者 52位大小写字母+10位数字】
+     */
+    function __construct($key = 3.145902678, $lower = false) {
+        if ($lower === true) {
+            $this->strbase = $this->strbaseLower;
+        } elseif ($lower) {
+            $this->strbase = $lower;
+        }
+
+        $length = intval(mb_strlen($this->strbase) / 3);
+
         $this->key = $key;
         $this->length = $length;
         $this->codelen = substr($this->strbase, 0, $this->length);
